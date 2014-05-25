@@ -21,6 +21,9 @@ if RUBY_VERSION < "1.9"
   exit(1)
 end
 
+current_dir = File.dirname(__FILE__)
+header_dir = RUBY_VERSION.gsub('.', '')
+
 hdrs = if RUBY_VERSION == '1.9.2'
   lambda {
     have_struct_member("rb_method_entry_t", "body", "method.h")
@@ -69,6 +72,8 @@ extern VALUE rb_iseq_new_main(NODE *node, VALUE filename, VALUE filepath);
 SRC
     end
       $defs << "-DHAVE_RB_ISEQ_COMPILE_ON_BASE  -DVM_DEBUG_BP_CHECK -DHAVE_RB_CONTROL_FRAME_T_EP -DHAVE_RB_ISEQ_T_LOCATION -DHAVE_RB_ISEQ_T_LINE_INFO_SIZE "
+      
+      header_dir[-1] = '0' # Ignore build number
     end
   }
 else
@@ -77,8 +82,6 @@ else
 end
 
 
-header_dir = RUBY_VERSION.gsub('.', '')
-current_dir = File.dirname(__FILE__)
 %w{ruby_debug.h ruby_debug.c breakpoint.c}.each do |file|
   FileUtils.cp("#{current_dir}/#{header_dir}/#{file}", current_dir)
 end
